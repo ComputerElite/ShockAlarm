@@ -1,0 +1,4 @@
+build
+.svelte-kit/generated
+.svelte-kit/output
+node_modules
