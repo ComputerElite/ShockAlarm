@@ -194,15 +194,18 @@ namespace ShockAlarm.Migrations
 
             modelBuilder.Entity("ShockAlarm.Alarm.Shocker", b =>
                 {
-                    b.HasOne("ShockAlarm.Alarm.Alarm", null)
+                    b.HasOne("ShockAlarm.Alarm.Alarm", "Alarm")
                         .WithMany("Shockers")
-                        .HasForeignKey("AlarmId");
+                        .HasForeignKey("AlarmId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ShockAlarm.Alarm.OpenshockApiToken", "ApiToken")
                         .WithMany()
                         .HasForeignKey("ApiTokenId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Alarm");
 
                     b.Navigation("ApiToken");
                 });

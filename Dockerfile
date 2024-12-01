@@ -1,6 +1,6 @@
 # Include dotnet6 sdk
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 RUN apt-get update && \
     apt-get install -y curl && \
@@ -16,11 +16,11 @@ WORKDIR /app/ShockAlarm/frontend
 RUN bash ./build_frontend.sh
 WORKDIR /app/ShockAlarm
 RUN dotnet build
-RUN mkdir -p bin/Debug/net6.0/
-RUN mkdir -p bin/Release/net6.0/
-RUN dotnet tool install --global --version 6.0.33 dotnet-ef
-RUN cp /app/ShockAlarm/docker_config.json /app/ShockAlarm/bin/Debug/net6.0/config.json
-RUN cp /app/ShockAlarm/docker_config.json /app/ShockAlarm/bin/Release/net6.0/config.json
+RUN mkdir -p bin/Debug/net8.0/
+RUN mkdir -p bin/Release/net8.0/
+RUN dotnet tool install --global --version 9.0.0 dotnet-ef
+RUN cp /app/ShockAlarm/docker_config.json /app/ShockAlarm/bin/Debug/net8.0/config.json
+RUN cp /app/ShockAlarm/docker_config.json /app/ShockAlarm/bin/Release/net8.0/config.json
 RUN cp /app/ShockAlarm/docker_config.json /app/ShockAlarm/config.json
 WORKDIR /app/ShockAlarm
 CMD ["bash", "migrate_db_and_start.sh"]

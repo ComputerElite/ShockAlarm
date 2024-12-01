@@ -55,12 +55,7 @@ public class Alarm
                     if(shocker.Enabled) controls.Add(shocker.CompileControl());
                 }
                 Logger.Log(JsonSerializer.Serialize(controls));
-
-                client.ControlShocker(new ControlRequest
-                {
-                    CustomName = Name,
-                    Shocks = controls
-                });
+                client.ControlShocker(new ControlRequest {CustomName = Name, Shocks = controls});
             }
 
             if (DisableAfterFirstTrigger)
