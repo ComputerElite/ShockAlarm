@@ -31,5 +31,9 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<Shocker>().Navigation(x => x.ApiToken).AutoInclude();
+        modelBuilder.Entity<Shocker>().Navigation(x => x.Permissions).AutoInclude();
+        modelBuilder.Entity<Shocker>().Navigation(x =>x.Limits).AutoInclude();
+        modelBuilder.Entity<Shocker>().HasOne(x => x.Permissions).WithOne().OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Shocker>().HasOne(x => x.Limits).WithOne().OnDelete(DeleteBehavior.Cascade);
     }
 }
