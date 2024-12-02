@@ -15,3 +15,13 @@ Voila, it's set up!
 2. Create an account by entering a username and password then pressing register
 3. Now enter an api token into the token field and press add
 4. After that create alarms and you're done
+
+## Features
+- [x] Schedule alarms for specific times and toggle weekdays
+- [x] Set alarms for own and **share** shockers
+
+## Planned features
+- [ ] Create alarm tones (patterns of what to do on a shocker)
+
+## UI as of 2024-12-02
+![ShockAlarm UI example](ShockAlarm/images/preview.jpg)
