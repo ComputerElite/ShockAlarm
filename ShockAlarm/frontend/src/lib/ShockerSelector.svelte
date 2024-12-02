@@ -15,17 +15,6 @@
     }
 </script>
 <style>
-    .shocker {
-        background: #222222;
-        border: var(--accent-color) solid 1px;
-        border-radius: var(--border-radius);
-        padding: 1em;
-        marin-bottom: 1em;
-    }
-    
-    body {
-        margin: 20px;
-    }
 </style>
 <div class="shockerContainer">
     {#each shockers as shocker}

@@ -13,6 +13,17 @@
     --green: #099209;
     --map-background-color: #333333;
 }
+.shocker {
+    background: #222222;
+    border: var(--accent-color) solid 1px;
+    border-radius: var(--border-radius);
+    padding: 1em;
+    marin-bottom: 1em;
+}
+
+body {
+    margin: 20px;
+}
 
 .between {
     display: flex;

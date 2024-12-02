@@ -23,6 +23,7 @@ function save() {
             alert(res.Error)
             return;
         }
+        location.reload();
         alert("Alarm saved")
     })
 }
@@ -38,6 +39,7 @@ function del() {
             return;
         }
         alert("Alarm deleted")
+        location.reload();
     })
 }
 </script>

@@ -4,6 +4,7 @@
     import { goto } from "$app/navigation";
     import {onMount} from "svelte";
     import Alarm from "$lib/Alarm.svelte";
+    import Token from "$lib/Token.svelte";
     
     onMount(() => {
         fetchJson("/api/v1/user/me", {}, localStorage).then((res) => {
@@ -59,11 +60,15 @@
 <button on:click={addToken}>Add</button>
 <h1>Current Tokens</h1>
 {#each tokens as token}
-    <p>{token.Id}: {token.ForOpenShockUser}</p>
+    <Token token={token}/>
+{:else}
+    <p>No tokens</p>
 {/each}
 <h1>Create alarm</h1>
 <Alarm/>
 <h1>Existing alarms</h1>
 {#each alarms as alarm}
     <Alarm alarm={alarm}/>
+{:else}
+    <p>No alarms</p>
 {/each}

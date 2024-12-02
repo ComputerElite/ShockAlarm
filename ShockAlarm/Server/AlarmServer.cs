@@ -16,7 +16,7 @@ public class AlarmServer
         server.AddRoute("GET", "/api/v1/tokens", request =>
         {
             request.allowAllOrigins = true;
-            User user = UserManagementServer.GetUserBySession(request);
+            User? user = UserManagementServer.GetUserBySession(request);
             if (user == null)
             {
                 ApiError.SendUnauthorized(request);
@@ -32,7 +32,7 @@ public class AlarmServer
         server.AddRoute("POST", "/api/v1/tokens", request =>
         {
             request.allowAllOrigins = true;
-            User user = UserManagementServer.GetUserBySession(request);
+            User? user = UserManagementServer.GetUserBySession(request);
             if (user == null)
             {
                 ApiError.SendUnauthorized(request);
@@ -78,6 +78,55 @@ public class AlarmServer
                 CreatedId = token.Id,
                 Success = true
             }), "application/json");
+            return true;
+        });
+        server.AddRoute("DELETE", "/api/v1/tokens", request =>
+        {
+            request.allowAllOrigins = true;
+            User? user = UserManagementServer.GetUserBySession(request);
+            if (user == null)
+            {
+                ApiError.SendUnauthorized(request);
+                return true;
+            }
+
+            OpenshockApiToken? token;
+            try
+            {
+                token = JsonSerializer.Deserialize<OpenshockApiToken>(request.bodyString);
+            } catch
+            {
+                ApiError.MalformedRequest(request);
+                return true;
+            }
+
+            if (token == null)
+            {
+                ApiError.MalformedRequest(request);
+                return true;
+            }
+            
+            using (AppDbContext d = new())
+            {
+                d.Attach(user);
+                OpenshockApiToken? existingToken = d.OpenshockApiTokens.FirstOrDefault(x => x.Id == token.Id);
+                if(existingToken == null)
+                {
+                    ApiError.SendNotFound(request);
+                    return true;
+                }
+                if(existingToken.User.Id != user.Id)
+                {
+                    ApiError.SendUnauthorized(request);
+                    return true;
+                }
+                d.Remove(existingToken);
+                d.SaveChanges();
+            }
+            request.SendString(JsonSerializer.Serialize(new ApiResponse
+            {
+                Success = true
+            }));
             return true;
         });
         server.AddRoute("GET", "/api/v1/shockers/", request =>
