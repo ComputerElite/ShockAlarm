@@ -15,6 +15,7 @@ public class Alarm
     public string Id { get; set; }
     public string Name { get; set; }
     public string Cron { get; set; }
+    public string TimeZone { get; set; } = "UTC";
     public DateTime? NextTrigger { get; set; }
     public bool DisableAfterFirstTrigger { get; set; }
     public bool Enabled { get; set; }
@@ -24,6 +25,7 @@ public class Alarm
     public void UpdateNextTrigger()
     {
         var cron = new CronExpression(Cron);
+        cron.TimeZone = TimeZoneInfo.FindSystemTimeZoneById(TimeZone);
         NextTrigger = cron.GetNextValidTimeAfter(DateTime.UtcNow)?.UtcDateTime ?? DateTime.MaxValue;
     }
 
