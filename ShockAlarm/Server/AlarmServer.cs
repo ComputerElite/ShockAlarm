@@ -221,22 +221,29 @@ public class AlarmServer
             alarm.User = user;
             using (AppDbContext d = new())
             {
-                d.Attach(user);
                 Alarm.Alarm? existingAlarm = d.Alarms.FirstOrDefault(x => x.Id == alarm.Id);
-                if(existingAlarm != null)
+                if (existingAlarm != null)
                 {
-                    if(existingAlarm.User.Id != user.Id)
+                    if (existingAlarm.User.Id != user.Id)
                     {
                         ApiError.SendUnauthorized(request);
                         return true;
                     }
+
                     d.Alarms.Remove(existingAlarm);
                     d.SaveChanges();
                 }
+            }
+            using(AppDbContext d = new())
+            {
+                d.Attach(user);
                 foreach (Shocker s in alarm.Shockers)
                 {
                     s.ApiToken = d.OpenshockApiTokens.FirstOrDefault(x => x.Id == s.ApiTokenId);
+                    s.Permissions.Id = null;
+                    s.Limits.Id = null;
                 }
+
                 alarm.UpdateNextTrigger();
                 d.Alarms.Add(alarm);
                 d.SaveChanges();
