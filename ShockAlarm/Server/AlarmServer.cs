@@ -159,7 +159,7 @@ public class AlarmServer
                             shockers.Add(new Shocker
                             {
                                 ShockerId = sr.Id.ToString(),
-                                Name = sr.Name,
+                                Name = device.Name + "." + sr.Name,
                                 ApiTokenId = token.Id
                             });
                         }

@@ -55,6 +55,18 @@
     }
     
 </script>
+{#if tokens.length > 0}
+    <h1>Create alarm</h1>
+    <Alarm/>
+    <h1>Existing alarms</h1>
+    {#each alarms as alarm}
+        <Alarm alarm={alarm}/>
+    {:else}
+        <p>No alarms</p>
+    {/each}
+{:else}
+    <p class="shocker">Add an access token from <a href="https://openshock.app/#/dashboard/tokens">OpenShock</a> below to create alarms for your shockers.</p>
+{/if}
 <h1>Add Token</h1>
 <input bind:value={token} type="text" id="token" placeholder="Token">
 <button on:click={addToken}>Add</button>
@@ -63,12 +75,4 @@
     <Token token={token}/>
 {:else}
     <p>No tokens</p>
-{/each}
-<h1>Create alarm</h1>
-<Alarm/>
-<h1>Existing alarms</h1>
-{#each alarms as alarm}
-    <Alarm alarm={alarm}/>
-{:else}
-    <p>No alarms</p>
 {/each}

@@ -23,10 +23,8 @@ public class Alarm
 
     public void UpdateNextTrigger()
     {
-        Logger.Log("Updating next trigger for alarm " + Name + "  " + Cron);
         var cron = new CronExpression(Cron);
         NextTrigger = cron.GetNextValidTimeAfter(DateTime.UtcNow)?.UtcDateTime ?? DateTime.MaxValue;
-        Logger.Log(NextTrigger.ToString());
     }
 
     public bool TriggerIfApplicable(DateTime now)

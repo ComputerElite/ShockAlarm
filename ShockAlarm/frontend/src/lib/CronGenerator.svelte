@@ -60,8 +60,7 @@
 </style>
 <div>
     {#each allWeekdays as day}
-        <input type="checkbox" id={day} on:change={() => toggleWeekday(day)} checked={weekdays.includes(allWeekdays.indexOf(day))}>
-        <label for={day}>{day}</label>
+        <button class={weekdays.includes(allWeekdays.indexOf(day)) ? "round on" : "round off"} on:click={() => toggleWeekday(day)}>{day}</button>
     {/each}
 </div>
 <input type="number" min="0" max="23" step="1" on:change={updateCron} bind:value={hour}>:

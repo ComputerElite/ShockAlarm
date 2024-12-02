@@ -52,11 +52,16 @@ function del() {
     }
 </style>
 <div class="alarm">
-    <input type="text" bind:value={alarm.Name}>
-    <input type="checkbox" bind:checked={alarm.Enabled}>
+    <div class="flex-middle">
+        <label class="switch">
+            <input type="checkbox" bind:checked={alarm.Enabled}>
+            <span class="slider"></span>
+        </label>
+        <input type="text" bind:value={alarm.Name}></div>
+    
     <CronGenerator bind:cron={alarm.Cron}/>
     <br>
-    <br>
+    <h2>Shockers</h2>
     <ShockerSelector bind:shockers={alarm.Shockers}/>
     <button on:click={save}>Save</button>
     <button on:click={del}>Delete</button>

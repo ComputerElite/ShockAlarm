@@ -1,6 +1,7 @@
 :root {
     --txt-color: #EEE;
     --accent-color: #9d00ff;
+    --accent-color-border: #a75bd1;
     --accent-color-hover: #9d00ff55;
     --accent-color-transparent: #9d00ff22;
     --bg-color: #333;
@@ -12,13 +13,27 @@
     --red: #920909;
     --green: #099209;
     --map-background-color: #333333;
+    --link-color: #00a6ff;
 }
 .shocker {
     background: #222222;
     border: var(--accent-color) solid 1px;
     border-radius: var(--border-radius);
-    padding: 1em;
-    marin-bottom: 1em;
+    padding: .5em;
+    margin-bottom: .5em;
+}
+
+select {
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid var(--accent-color);
+    margin: 5px;
+    background-color: var(--bg-color);
+    color: var(--txt-color)
+}
+
+a {
+    color: var(--link-color);
 }
 
 body {
@@ -46,11 +61,99 @@ body {
     background-color: var(--green) !important;
 }
 
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-color-dark);
+    -webkit-transition: .2s;
+    transition: .2s;
+}
+
+.flex-middle {
+    display: flex;
+    align-items: center;
+    
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .2s;
+    transition: .2s;
+}
+
+input:checked + .slider {
+    background-color: var(--accent-color);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--accent-color);
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider {
+    border-radius: 34px;
+}
+
+.slider:before {
+    border-radius: 50%;
+}
+
 .content_bg {
     background-color: var(--bg-color);
     border-radius: var(--border-radius);
     padding: var(--content-padding);
     margin: var(--content-padding);
+}
+
+.round {
+
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    transition: background-color,border-color 0.2s;
+}
+
+.on {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color-border);
+
+}
+
+.off {
+    background-color: var(--bg-color-dark);
+    border-color: var(--bg-color);
 }
 
 button {
@@ -83,7 +186,6 @@ input {
 
 body {
     color: var(--txt-color);
-    margin: 0px;
     height: 100vh;
     font-family: "Open Sans";
 }
