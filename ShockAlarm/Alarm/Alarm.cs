@@ -27,6 +27,7 @@ public class Alarm
         var cron = new CronExpression(Cron);
         cron.TimeZone = TimeZoneInfo.FindSystemTimeZoneById(TimeZone);
         NextTrigger = cron.GetNextValidTimeAfter(DateTime.UtcNow)?.UtcDateTime ?? DateTime.MaxValue;
+        Logger.Log(Name + " at " + NextTrigger + " UTC");
     }
 
     public bool TriggerIfApplicable(DateTime now)

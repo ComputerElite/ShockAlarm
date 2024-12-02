@@ -59,7 +59,7 @@ function del() {
         </label>
         <input type="text" bind:value={alarm.Name}></div>
     
-    <CronGenerator bind:cron={alarm.Cron}/>
+    <CronGenerator bind:timeZone={alarm.TimeZone} bind:cron={alarm.Cron}/>
     <br>
     <h2>Shockers</h2>
     <ShockerSelector bind:shockers={alarm.Shockers}/>
