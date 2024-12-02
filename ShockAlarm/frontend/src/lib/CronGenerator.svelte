@@ -3,7 +3,6 @@
 
     export let cron = "0 0 12 ? * *";
     export let timeZone;
-    export let cronUtc = "0 0 12 ? * *";
     let second;
     let minute;
     let hour;
@@ -78,4 +77,3 @@
 <br>
 <br>
 <code>{cron}</code>
-<code>{cronUtc}</code>
