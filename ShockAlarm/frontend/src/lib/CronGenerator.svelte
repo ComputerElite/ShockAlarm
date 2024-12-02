@@ -3,6 +3,8 @@
 
     export let cron = "0 0 12 ? * *";
     export let timeZone;
+    export let expanded;
+    export let onChange;
     let second;
     let minute;
     let hour;
@@ -43,6 +45,7 @@
     function updateCron() {
         let weekdays 
         cron = `${second} ${minute} ${hour} ${dayOfMonth} ${month} ${mapCron(weekdays)}`;
+        onChange();
     }
     
     function toggleWeekday(day) {
@@ -74,6 +77,8 @@
 <input type="number" min="0" max="59" step="1" on:change={updateCron} bind:value={minute}>:
 <input type="number" min="0" max="59" step="1" on:change={updateCron} bind:value={second}>
 <input type="text" bind:value={timeZone}>
-<br>
-<br>
-<code>{cron}</code>
+{#if expanded}
+    <br>
+    <br>
+    <code>{cron}</code>
+{/if}

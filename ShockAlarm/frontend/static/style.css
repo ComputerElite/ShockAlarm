@@ -55,10 +55,12 @@ body {
 
 .red {
     background-color: var(--red) !important;
+    border-color: var(--red) !important;
 }
 
 .green {
     background-color: var(--green) !important;
+    border-color: var(--green) !important;
 }
 
 /* The switch - the box around the slider */

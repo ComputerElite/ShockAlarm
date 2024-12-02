@@ -2,6 +2,7 @@
 import ShockerSelector from "$lib/ShockerSelector.svelte";
 import CronGenerator from "$lib/CronGenerator.svelte";
 import { fetchJson } from "./Script.svelte";
+import {onMount} from "svelte";
 
 export let alarm = {
     Id: null,
@@ -11,6 +12,12 @@ export let alarm = {
     Shockers: [],
     DisableAfterFirstTrigger: false
 }
+
+let initialEnabled = alarm.Enabled;
+
+onMount(() => {
+    initialEnabled = alarm.Enabled;
+})
 
 function save() {
     console.log(alarm)
@@ -42,6 +49,16 @@ function del() {
         location.reload();
     })
 }
+
+export let expanded = false;
+function alarmChanged() {
+    expanded = true;
+}
+
+$: if(initialEnabled != alarm.Enabled) {
+    alarmChanged();
+}
+    
 </script>
 <style>
     .alarm {
@@ -50,19 +67,43 @@ function del() {
         padding: 1em;
         border-radius: 0.5em;
     }
-</style>
-<div class="alarm">
-    <div class="flex-middle">
-        <label class="switch">
-            <input type="checkbox" bind:checked={alarm.Enabled}>
-            <span class="slider"></span>
-        </label>
-        <input type="text" bind:value={alarm.Name}></div>
     
-    <CronGenerator bind:timeZone={alarm.TimeZone} bind:cron={alarm.Cron}/>
-    <br>
-    <h2>Shockers</h2>
-    <ShockerSelector bind:shockers={alarm.Shockers}/>
-    <button on:click={save}>Save</button>
-    <button on:click={del}>Delete</button>
+    .expand {
+        background: none;
+        border: none;
+        border-radius: 0;
+        transform: rotate(45deg);
+        border-right: 2px solid var(--txt-color);
+        border-bottom: 2px solid var(--txt-color);
+        height: 10px;
+        width: 10px;
+        transition: transform 0.2s;
+        margin: 10px;
+    }
+    
+    .expanded {
+        transform: rotate(225deg);
+    }
+</style>
+<div class="shocker">
+    <div class="between">
+        <div class="flex-middle">
+            <label class="switch">
+                <input type="checkbox" bind:checked={alarm.Enabled}>
+                <span class="slider"></span>
+            </label>
+            <input type="text" bind:value={alarm.Name}>
+        </div>
+        <button class={expanded ? "expand expanded" : "expand"} on:click={() => expanded = !expanded}></button>
+    </div>
+    <CronGenerator onChange={alarmChanged} bind:expanded={expanded} bind:timeZone={alarm.TimeZone} bind:cron={alarm.Cron}/>
+    {#if expanded}
+        <br>
+        <h2>Shockers</h2>
+        <ShockerSelector bind:shockers={alarm.Shockers}/>
+        <button class="green" on:click={save}>{alarm.Id ? "Save" : "Add alarm"}</button>
+        {#if alarm.Id}
+            <button class="red" on:click={del}>Delete</button>
+        {/if}
+    {/if}
 </div>
