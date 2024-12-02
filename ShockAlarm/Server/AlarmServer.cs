@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Text.Json;
 using ComputerUtils.Logging;
 using ComputerUtils.Webserver;
@@ -152,7 +153,8 @@ public class AlarmServer
                         request.SendString(JsonSerializer.Serialize(new ApiError {Message = "Token invalid"}), "application/json", 401);
                         return true;
                     }
-                    foreach (ResponseDeviceWithShockers device in devices.Result.AsT0.Value)
+                    List<ResponseDeviceWithShockers> devicesAll = devices.Result.AsT0.Value.ToList();
+                    foreach (ResponseDeviceWithShockers device in devicesAll)
                     {
                         foreach (ShockerResponse sr in device.Shockers)
                         {
@@ -160,8 +162,30 @@ public class AlarmServer
                             {
                                 ShockerId = sr.Id.ToString(),
                                 Name = device.Name + "." + sr.Name,
-                                ApiTokenId = token.Id
+                                ApiTokenId = token.Id,
+                                Paused = sr.IsPaused,
+                                Limits = new OpenShockShockerLimits(),
+                                Permissions = new OpenShockShockerPermissions()
                             });
+                        }
+                    }
+                    List<OpenShockDevicesContainer> sharedShockers = GetSharedShockers(token) ?? new List<OpenShockDevicesContainer>();
+                    foreach (OpenShockDevicesContainer container in sharedShockers)
+                    {
+                        foreach (OpenShockDevice device in container.devices)
+                        {
+                            foreach (OpenShockShocker sr in device.shockers)
+                            {
+                                shockers.Add(new Shocker
+                                {
+                                    ShockerId = sr.id,
+                                    Name = device.name + "." + sr.name,
+                                    ApiTokenId = token.Id,
+                                    Paused = sr.isPaused,
+                                    Limits = sr.limits,
+                                    Permissions = sr.permissions
+                                });
+                            }
                         }
                     }
                 }
@@ -290,6 +314,34 @@ public class AlarmServer
             }));
             return true;
         });
+    }
+
+    private static List<OpenShockDevicesContainer>? GetSharedShockers(OpenshockApiToken token)
+    {
+        HttpClient client = new();
+        client.DefaultRequestHeaders.Add("OpenShockToken", token.Token);
+        client.DefaultRequestHeaders.Add("accept", "application/json");
+        client.DefaultRequestHeaders.Add("User-Agent", "ShockAlarm");
+        
+        HttpResponseMessage response = client.GetAsync(token.Server + "/1/shockers/shared").Result;
+        if (!response.IsSuccessStatusCode)
+        {
+            Logger.Log("Failed to get shared shockers");
+            return new List<OpenShockDevicesContainer>();
+        }
+
+        try
+        {
+            string txt = response.Content.ReadAsStringAsync().Result;
+            Logger.Log(txt);
+            var sharedShockers = JsonSerializer.Deserialize<OpenShockApiData<List<OpenShockDevicesContainer>>>(txt);
+            Logger.Log(JsonSerializer.Serialize(sharedShockers));
+            return sharedShockers?.data;
+        } catch(Exception e)
+        {
+            Logger.Log("Failed to parse shared shockers: " + e);
+            return new List<OpenShockDevicesContainer>();
+        }
     }
 
     private static OpenShockApiClient? GetApiClientBasedOnTokenId(User user, string token)

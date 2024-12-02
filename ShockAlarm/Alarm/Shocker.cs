@@ -21,6 +21,10 @@ public class Shocker
     [JsonIgnore]
     public Alarm? Alarm { get; set; }
 
+    public bool Paused { get; set; }
+    public OpenShockShockerLimits Limits { get; set; }
+    public OpenShockShockerPermissions Permissions { get; set; }
+
     public Shocker() {}
 
     public Shocker(ShockerResponse r, OpenshockApiToken token)
