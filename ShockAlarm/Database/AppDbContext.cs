@@ -29,7 +29,9 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Alarm.Alarm>().Navigation(x => x.User).AutoInclude();
         modelBuilder.Entity<Alarm.Alarm>().HasMany(x => x.Shockers).WithOne(x => x.Alarm)
             .OnDelete(DeleteBehavior.Cascade);
-        
+        modelBuilder.Entity<AlarmTone>().Navigation(x => x.Components).AutoInclude();
+        modelBuilder.Entity<AlarmTone>().Navigation(x => x.User).AutoInclude();
+        modelBuilder.Entity<AlarmTone>().HasMany(x => x.Components).WithOne().OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<Shocker>().Navigation(x => x.ApiToken).AutoInclude();
         modelBuilder.Entity<Shocker>().Navigation(x => x.Permissions).AutoInclude();
         modelBuilder.Entity<Shocker>().Navigation(x =>x.Limits).AutoInclude();

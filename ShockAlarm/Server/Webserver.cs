@@ -20,7 +20,7 @@ public class Webserver
         IScheduler s = StdSchedulerFactory.GetDefaultScheduler().Result;
         s.Start();
         IJobDetail job = JobBuilder.Create<AlarmSchedulerJob>().Build();
-        ITrigger trigger = TriggerBuilder.Create().WithIdentity("UpdateAlarmStatus").StartNow().WithSimpleSchedule(x => x.WithIntervalInSeconds(5).RepeatForever()).Build();
+        ITrigger trigger = TriggerBuilder.Create().WithIdentity("UpdateAlarmStatus").StartNow().WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever()).Build();
         s.ScheduleJob(job, trigger);
         Server.StartServer(Config.Instance.port);
     }

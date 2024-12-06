@@ -54,6 +54,58 @@ namespace ShockAlarm.Migrations
                     b.ToTable("Alarms");
                 });
 
+            modelBuilder.Entity("ShockAlarm.Alarm.AlarmTone", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AlarmTone");
+                });
+
+            modelBuilder.Entity("ShockAlarm.Alarm.AlarmToneComponent", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AlarmToneId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ControlType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ushort>("Duration")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte>("Intensity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TriggerSeconds")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlarmToneId");
+
+                    b.ToTable("AlarmToneComponent");
+                });
+
             modelBuilder.Entity("ShockAlarm.Alarm.OpenShockShockerLimits", b =>
                 {
                     b.Property<string>("Id")
@@ -145,6 +197,7 @@ namespace ShockAlarm.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("LimitsId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -155,6 +208,7 @@ namespace ShockAlarm.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PermissionsId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ShockerId")
@@ -166,9 +220,11 @@ namespace ShockAlarm.Migrations
 
                     b.HasIndex("ApiTokenId");
 
-                    b.HasIndex("LimitsId");
+                    b.HasIndex("LimitsId")
+                        .IsUnique();
 
-                    b.HasIndex("PermissionsId");
+                    b.HasIndex("PermissionsId")
+                        .IsUnique();
 
                     b.ToTable("Shockers");
                 });
@@ -237,6 +293,25 @@ namespace ShockAlarm.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ShockAlarm.Alarm.AlarmTone", b =>
+                {
+                    b.HasOne("ShockAlarm.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ShockAlarm.Alarm.AlarmToneComponent", b =>
+                {
+                    b.HasOne("ShockAlarm.Alarm.AlarmTone", null)
+                        .WithMany("Components")
+                        .HasForeignKey("AlarmToneId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("ShockAlarm.Alarm.OpenshockApiToken", b =>
                 {
                     b.HasOne("ShockAlarm.Users.User", "User")
@@ -260,12 +335,16 @@ namespace ShockAlarm.Migrations
                         .IsRequired();
 
                     b.HasOne("ShockAlarm.Alarm.OpenShockShockerLimits", "Limits")
-                        .WithMany()
-                        .HasForeignKey("LimitsId");
+                        .WithOne()
+                        .HasForeignKey("ShockAlarm.Alarm.Shocker", "LimitsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ShockAlarm.Alarm.OpenShockShockerPermissions", "Permissions")
-                        .WithMany()
-                        .HasForeignKey("PermissionsId");
+                        .WithOne()
+                        .HasForeignKey("ShockAlarm.Alarm.Shocker", "PermissionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Alarm");
 
@@ -279,6 +358,11 @@ namespace ShockAlarm.Migrations
             modelBuilder.Entity("ShockAlarm.Alarm.Alarm", b =>
                 {
                     b.Navigation("Shockers");
+                });
+
+            modelBuilder.Entity("ShockAlarm.Alarm.AlarmTone", b =>
+                {
+                    b.Navigation("Components");
                 });
 #pragma warning restore 612, 618
         }

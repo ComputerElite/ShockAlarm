@@ -4,16 +4,13 @@ using OpenShock.SDK.CSharp.Models;
 
 namespace ShockAlarm.Alarm;
 
-public class Shocker
+public class Shocker : ShockerControlData
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string Id { get; set; }
     public string? ShockerId { get; set; }
     public string Name { get; set; } = "unnamed shocker";
     public bool Enabled { get; set; } = false;
-    public ControlType ControlType { get; set; } = ControlType.Vibrate;
-    public byte Intensity { get; set; } = 50;
-    public ushort Duration { get; set; } = 500;
     public string ApiTokenId { get; set; }
     [JsonIgnore]
     public OpenshockApiToken? ApiToken { get; set; }
@@ -46,4 +43,11 @@ public class Shocker
             Intensity = Intensity
         };
     }
+}
+
+public class ShockerControlData
+{
+    public ControlType ControlType { get; set; } = ControlType.Vibrate;
+    public byte Intensity { get; set; } = 50;
+    public ushort Duration { get; set; } = 500;
 }
