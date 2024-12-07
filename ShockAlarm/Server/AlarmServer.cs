@@ -321,6 +321,124 @@ public class AlarmServer
             }));
             return true;
         });
+        server.AddRoute("GET", "/api/v1/tones", request =>
+        {
+            request.allowAllOrigins = true;
+            User? user = UserManagementServer.GetUserBySession(request);
+            if (user == null)
+            {
+                ApiError.SendUnauthorized(request);
+                return true;
+            }
+            List<AlarmTone> tones;
+            using (AppDbContext d = new())
+            {
+                tones = d.AlarmTones.Where(x => x.User.Id == user.Id || x.IsPublic).ToList();
+            }
+            request.SendString(JsonSerializer.Serialize(tones), "application/json");
+            return true;
+        });
+        server.AddRoute("POST", "/api/v1/tones", request =>
+        {
+            request.allowAllOrigins = true;
+            User? user = UserManagementServer.GetUserBySession(request);
+            if (user == null)
+            {
+                ApiError.SendUnauthorized(request);
+                return true;
+            }
+            AlarmTone? tone;
+            try
+            {
+                tone = JsonSerializer.Deserialize<AlarmTone>(request.bodyString);
+            } catch
+            {
+                ApiError.MalformedRequest(request);
+                return true;
+            }
+            
+            if (tone == null)
+            {
+                ApiError.MalformedRequest(request);
+                return true;
+            }
+            tone.User = user;
+            using (AppDbContext d = new())
+            {
+                AlarmTone? existingTone = d.AlarmTones.FirstOrDefault(x => x.Id == tone.Id);
+                if (existingTone != null)
+                {
+                    if (existingTone.User.Id != user.Id)
+                    {
+                        ApiError.SendUnauthorized(request);
+                        return true;
+                    }
+
+                    d.AlarmTones.Remove(existingTone);
+                    d.SaveChanges();
+                }
+            }
+            
+            using(AppDbContext d = new())
+            {
+                d.Attach(user);
+                d.AlarmTones.Add(tone);
+                d.SaveChanges();
+            }
+            request.SendString(JsonSerializer.Serialize(new ApiResponse
+            {
+                CreatedId = tone.Id,
+                Success = true
+            }));
+            return true;
+        });
+        server.AddRoute("DELETE", "/api/v1/tones", request =>
+        {
+            request.allowAllOrigins = true;
+            User? user = UserManagementServer.GetUserBySession(request);
+            if (user == null)
+            {
+                ApiError.SendUnauthorized(request);
+                return true;
+            }
+            AlarmTone? toDelete;
+            try
+            {
+                toDelete = JsonSerializer.Deserialize<AlarmTone>(request.bodyString);
+            } catch
+            {
+                ApiError.MalformedRequest(request);
+                return true;
+            }
+            
+            if (toDelete == null)
+            {
+                ApiError.MalformedRequest(request);
+                return true;
+            }
+            using (AppDbContext d = new())
+            {
+                d.Attach(user);
+                AlarmTone? existingTone = d.AlarmTones.FirstOrDefault(x => x.Id == toDelete.Id);
+                if(existingTone == null)
+                {
+                    ApiError.SendNotFound(request);
+                    return true;
+                }
+                if(existingTone.User.Id != user.Id)
+                {
+                    ApiError.SendUnauthorized(request);
+                    return true;
+                }
+                d.Remove(existingTone);
+                d.SaveChanges();
+            }
+            request.SendString(JsonSerializer.Serialize(new ApiResponse
+            {
+                Success = true
+            }));
+            return true;
+        });
     }
 
     private static List<OpenShockDevicesContainer>? GetSharedShockers(OpenshockApiToken token)
@@ -374,6 +492,7 @@ public class AlarmServer
 
     private static List<Alarm.Alarm> AlarmCache { get; set; } = new List<Alarm.Alarm>();
     private static DateTime LastCacheUpdate { get; set; } = DateTime.MinValue;
+    public static List<string> ActiveAlarmIds { get; set; } = new List<string>();
     public static void UpdateAlarmCache()
     {
         AlarmCache.Clear();
@@ -390,5 +509,20 @@ public class AlarmServer
         }
 
         return AlarmCache;
+    }
+
+    public static void DisableAlarm(string id)
+    {
+        if(IsAlarmActive(id)) ActiveAlarmIds.Remove(id);
+    }
+    
+    public static void EnableAlarm(string id)
+    {
+        if(!IsAlarmActive(id)) ActiveAlarmIds.Add(id);
+    }
+    
+    public static bool IsAlarmActive(string id)
+    {
+        return ActiveAlarmIds.Contains(id);
     }
 }

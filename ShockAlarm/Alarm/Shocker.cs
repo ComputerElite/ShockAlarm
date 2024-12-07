@@ -17,6 +17,7 @@ public class Shocker : ShockerControlData
 
     [JsonIgnore]
     public Alarm? Alarm { get; set; }
+    public AlarmTone? Tone { get; set; }
 
     public bool Paused { get; set; }
     public string LimitsId { get; set; }

@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<UserSession> Sessions { get; set; }
     public DbSet<OpenshockApiToken> OpenshockApiTokens { get; set; }
     public DbSet<Shocker> Shockers { get; set; }
+    public DbSet<AlarmTone> AlarmTones { get; set; }
     public DbSet<Alarm.Alarm> Alarms { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -35,6 +36,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Shocker>().Navigation(x => x.ApiToken).AutoInclude();
         modelBuilder.Entity<Shocker>().Navigation(x => x.Permissions).AutoInclude();
         modelBuilder.Entity<Shocker>().Navigation(x =>x.Limits).AutoInclude();
+        modelBuilder.Entity<Shocker>().Navigation(x => x.Tone).AutoInclude();
         modelBuilder.Entity<Shocker>().HasOne(x => x.Permissions).WithOne().OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<Shocker>().HasOne(x => x.Limits).WithOne().OnDelete(DeleteBehavior.Cascade);
     }

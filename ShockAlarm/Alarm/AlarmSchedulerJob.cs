@@ -12,7 +12,7 @@ public class AlarmSchedulerJob : IJob
 {
     public Task Execute(IJobExecutionContext context)
     {
-        Logger.Log("Checking alarms");
+        //Logger.Log("Checking alarms");
         List<Alarm> alarms = AlarmServer.GetAllAlarms();
         DateTime now = DateTime.UtcNow;
         bool changed = false;

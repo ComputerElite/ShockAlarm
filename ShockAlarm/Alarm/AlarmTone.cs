@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using OpenShock.SDK.CSharp.Models;
 using ShockAlarm.Users;
 
 namespace ShockAlarm.Alarm;
@@ -18,5 +19,21 @@ public class AlarmToneComponent : ShockerControlData
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string Id { get; set; }
 
-    public int TriggerSeconds { get; set; } = 0;
+    public double TriggerSeconds { get; set; } = 0;
+    [NotMapped]
+    public DateTime TriggerTime { get; set; }
+    [NotMapped]
+    public Shocker Shocker { get; set; }
+
+    public Control CompileControl()
+    {
+        return new Control
+        {
+            Duration = Duration,
+            Exclusive = true,
+            Id = new Guid(Shocker.ShockerId),
+            Type = ControlType,
+            Intensity = Intensity
+        };
+    }
 }

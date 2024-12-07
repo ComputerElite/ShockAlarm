@@ -43,6 +43,7 @@ public class Alarm
         {
             Logger.Log("Triggering alarm " + Name);
             // Group shockers by token
+            List<Shocker> shockersForThread = new List<Shocker>();
             var shockersByToken = Shockers.GroupBy(s => s.ApiTokenId);
             foreach (var shockerGroup in shockersByToken)
             {
@@ -53,11 +54,61 @@ public class Alarm
                 List<Control> controls = new();
                 foreach (var shocker in shockerGroup)
                 {
-                    if(shocker.Enabled) controls.Add(shocker.CompileControl());
+                    if (!shocker.Enabled) continue;
+                    if(shocker.Tone == null) controls.Add(shocker.CompileControl());
+                    else
+                    {
+                        shockersForThread.Add(shocker);
+                    }
                 }
                 Logger.Log(JsonSerializer.Serialize(controls));
                 client.ControlShocker(new ControlRequest {CustomName = Name, Shocks = controls});
             }
+            if(shockersForThread.Count > 0)
+            {
+                AlarmServer.EnableAlarm(Id);
+                // Prepare shockers
+                List<AlarmToneComponent> components = new();
+                DateTime nowUtc = DateTime.UtcNow;
+                foreach (Shocker shocker in shockersForThread)
+                {
+                    foreach (AlarmToneComponent component in shocker.Tone?.Components ?? new List<AlarmToneComponent>())
+                    {
+                        Logger.Log("Preparing shocker " + shocker.Name + " for component " + component.Id);
+                        component.Shocker = shocker;
+                        component.TriggerTime = nowUtc.AddSeconds(component.TriggerSeconds);
+                        components.Add(component);
+                    }
+                }
+
+                components = components.OrderBy(x => x.TriggerSeconds).ToList();
+                
+                new Thread(() =>
+                {
+                    while (components.Count > 0)
+                    {
+                        if(!AlarmServer.IsAlarmActive(Id)) break;
+                        if (components[0].TriggerTime <= DateTime.UtcNow)
+                        {
+                            AlarmToneComponent component = components[0];
+                            components.RemoveAt(0);
+                            Logger.Log(
+                                "Triggering component " + component.Id + " for shocker " + component.Shocker.Name);
+                            OpenShockApiClient client = AlarmServer.GetApiClient(component.Shocker.ApiToken);
+                            client.ControlShocker(new ControlRequest
+                            {
+                                CustomName = Name,
+                                Shocks = new List<Control> { component.CompileControl() }
+                            });
+                            continue;
+                        }
+
+                        Thread.Sleep(50);
+                    }
+                    AlarmServer.DisableAlarm(Id);
+                }).Start();
+            }
+            
 
             if (DisableAfterFirstTrigger)
             {
