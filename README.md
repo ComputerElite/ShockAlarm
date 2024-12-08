@@ -19,9 +19,12 @@ Voila, it's set up!
 ## Features
 - [x] Schedule alarms for specific times and toggle weekdays
 - [x] Set alarms for own and **share** shockers
+- [x] Create alarm tones (patterns of what to do on a shocker)
 
 ## Planned features
-- [ ] Create alarm tones (patterns of what to do on a shocker)
+- [ ] Copy components of alarm tone
+- [ ] Select alarm tone
+- [ ] Preview alarm behavior on shocker
 
 ## UI as of 2024-12-02
 ![ShockAlarm UI example](ShockAlarm/images/preview.jpg)

@@ -10,8 +10,10 @@ export let alarm = {
     Enabled: false,
     Name: "New Alarm",
     Shockers: [],
-    DisableAfterFirstTrigger: false
+    DisableAfterFirstTrigger: false,
+    ToneId: null
 }
+export let tones = []
 
 let initialEnabled = alarm.Enabled;
 
@@ -100,7 +102,7 @@ $: if(initialEnabled != alarm.Enabled) {
     {#if expanded}
         <br>
         <h2>Shockers</h2>
-        <ShockerSelector bind:shockers={alarm.Shockers}/>
+        <ShockerSelector tones={tones} bind:shockers={alarm.Shockers}/>
         <button class="green" on:click={save}>{alarm.Id ? "Save" : "Add alarm"}</button>
         {#if alarm.Id}
             <button class="red" on:click={del}>Delete</button>

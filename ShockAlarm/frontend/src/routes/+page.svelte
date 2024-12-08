@@ -29,6 +29,7 @@
             tokens = res;
         });
         fetchAlarms();
+        fetchTones()
     }
     let token;
     let alarms = [];
@@ -70,10 +71,10 @@
 </script>
 {#if tokens.length > 0}
     <h1>Create alarm</h1>
-    <Alarm expanded={true}/>
+    <Alarm tones={tones} expanded={true}/>
     <h1>Existing alarms</h1>
     {#each alarms as alarm}
-        <Alarm alarm={alarm}/>
+        <Alarm tones={tones} alarm={alarm}/>
     {:else}
         <p>No alarms</p>
     {/each}
