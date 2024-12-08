@@ -27,6 +27,7 @@ Voila, it's set up!
 
 ## Planned features
 - [ ] Pretty up UI
+- [ ] Update shocker limits when you edit an alarm
 
 ## UI as of 2024-12-02
 ![ShockAlarm UI example](ShockAlarm/images/preview.jpg)
