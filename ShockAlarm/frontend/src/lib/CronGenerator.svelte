@@ -2,6 +2,7 @@
     import {onMount} from "svelte";
 
     export let cron = "0 0 12 ? * *";
+    export let DisableAfterFirstTrigger;
     export let timeZone;
     export let expanded;
     export let onChange;
@@ -45,6 +46,7 @@
     function updateCron() {
         let weekdays 
         cron = `${second} ${minute} ${hour} ${dayOfMonth} ${month} ${mapCron(weekdays)}`;
+        DisableAfterFirstTrigger = weekdays.length <= 0
         onChange();
     }
     

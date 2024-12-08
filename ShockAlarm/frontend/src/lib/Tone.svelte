@@ -52,9 +52,8 @@ function toneChanged() {
 }
 
 function sortComponents() {
-    tone.Components.sort((a, b) => a.TriggerSeconds - b.TriggerSeconds)
+    tone.Components = tone.Components.sort((a, b) => a.TriggerSeconds - b.TriggerSeconds)
     tone.Components = tone.Components
-    
 }
 
 function addComponent() {

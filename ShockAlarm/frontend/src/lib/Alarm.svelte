@@ -10,7 +10,7 @@ export let alarm = {
     Enabled: false,
     Name: "New Alarm",
     Shockers: [],
-    DisableAfterFirstTrigger: false,
+    DisableAfterFirstTrigger: true,
     ToneId: null
 }
 export let tones = []
@@ -22,7 +22,6 @@ onMount(() => {
 })
 
 function save() {
-    console.log(alarm)
     fetchJson("/api/v1/alarms", {
         body: JSON.stringify(alarm),
         method: "POST"
@@ -34,6 +33,20 @@ function save() {
         }
         location.reload();
         alert("Alarm saved")
+    })
+}
+
+function test() {
+    fetchJson("/api/v1/alarms/test", {
+        body: JSON.stringify(alarm),
+        method: "POST"
+    }, localStorage).then((res) => {
+        if(!res.ok) {
+            console.error("Failed to test alarm");
+            alert(res.Error)
+            return;
+        }
+        alert("Alarm triggered")
     })
 }
 
@@ -98,12 +111,13 @@ $: if(initialEnabled != alarm.Enabled) {
         </div>
         <button class={expanded ? "expand expanded" : "expand"} on:click={() => expanded = !expanded}></button>
     </div>
-    <CronGenerator onChange={alarmChanged} bind:expanded={expanded} bind:timeZone={alarm.TimeZone} bind:cron={alarm.Cron}/>
+    <CronGenerator DisableAfterFirstTrigger={alarm.DisableAfterFirstTrigger} onChange={alarmChanged} bind:expanded={expanded} bind:timeZone={alarm.TimeZone} bind:cron={alarm.Cron}/>
     {#if expanded}
         <br>
         <h2>Shockers</h2>
         <ShockerSelector tones={tones} bind:shockers={alarm.Shockers}/>
         <button class="green" on:click={save}>{alarm.Id ? "Save" : "Add alarm"}</button>
+        <button on:click={test}>Test alarm (trigger it)</button>
         {#if alarm.Id}
             <button class="red" on:click={del}>Delete</button>
         {/if}

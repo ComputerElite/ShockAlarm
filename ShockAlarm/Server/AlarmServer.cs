@@ -257,6 +257,50 @@ public class AlarmServer
             }));
             return true;
         });
+         server.AddRoute("POST", "/api/v1/alarms/test", request =>
+        {
+            request.allowAllOrigins = true;
+            User? user = UserManagementServer.GetUserBySession(request);
+            if (user == null)
+            {
+                ApiError.SendUnauthorized(request);
+                return true;
+            }
+            Alarm.Alarm? alarm;
+            try
+            {
+                alarm = JsonSerializer.Deserialize<Alarm.Alarm>(request.bodyString);
+            } catch
+            {
+                ApiError.MalformedRequest(request);
+                return true;
+            }
+
+            if (alarm == null)
+            {
+                ApiError.MalformedRequest(request);
+                return true;
+            }
+            alarm.User = user;
+            using(AppDbContext d = new())
+            {
+                foreach (Shocker s in alarm.Shockers)
+                {
+                    s.ApiToken = d.OpenshockApiTokens.FirstOrDefault(x => x.Id == s.ApiTokenId);
+                    if(s.ToneId != null) s.Tone = d.AlarmTones.FirstOrDefault(x => x.Id == s.ToneId);
+                    if(s.Tone != null) s.ToneName = s.Tone.Name;
+                    s.Permissions.Id = null;
+                    s.Limits.Id = null;
+                }
+                alarm.Trigger();
+            }
+            request.SendString(JsonSerializer.Serialize(new ApiResponse
+            {
+                CreatedId = alarm.Id,
+                Success = true
+            }));
+            return true;
+        });
         server.AddRoute("GET", "/api/v1/alarms", request =>
         {
             request.allowAllOrigins = true;
