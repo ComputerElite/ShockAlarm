@@ -13,6 +13,7 @@ export let alarm = {
     DisableAfterFirstTrigger: true,
     ToneId: null
 }
+export let savedCallback;
 export let tones = []
 
 let initialEnabled = alarm.Enabled;
@@ -31,8 +32,7 @@ function save() {
             alert(res.Error)
             return;
         }
-        location.reload();
-        alert("Alarm saved")
+        savedCallback();
     })
 }
 
@@ -60,8 +60,7 @@ function del() {
             alert(res.Error)
             return;
         }
-        alert("Alarm deleted")
-        location.reload();
+        savedCallback();
     })
 }
 
@@ -117,9 +116,11 @@ $: if(initialEnabled != alarm.Enabled) {
         <h2>Shockers</h2>
         <ShockerSelector tones={tones} bind:shockers={alarm.Shockers}/>
         <button class="green" on:click={save}>{alarm.Id ? "Save" : "Add alarm"}</button>
-        <button on:click={test}>Test alarm (trigger it)</button>
+        <button class="warning" on:click={test}>Test alarm (trigger it)</button>
         {#if alarm.Id}
             <button class="red" on:click={del}>Delete</button>
+        {:else}
+            <button class="red" on:click={savedCallback}>Cancel</button>
         {/if}
     {/if}
 </div>

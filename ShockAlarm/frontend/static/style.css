@@ -14,6 +14,9 @@
     --green: #099209;
     --map-background-color: #333333;
     --link-color: #00a6ff;
+    --warning-color: #ffc400;
+    --warning-bg: #4e3d00;
+    --orange: #bc8f00;
 }
 .shocker {
     background: #222222;
@@ -21,6 +24,11 @@
     border-radius: var(--border-radius);
     padding: .5em;
     margin-bottom: .5em;
+}
+
+.warning {
+    border: var(--warning-color) solid 1px;
+    background: var(--warning-bg);
 }
 
 select {

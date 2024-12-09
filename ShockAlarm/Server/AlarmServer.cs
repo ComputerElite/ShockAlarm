@@ -139,56 +139,12 @@ public class AlarmServer
                 ApiError.SendUnauthorized(request);
                 return true;
             }
-            List<Shocker> shockers = new();
-            using (AppDbContext d = new())
+
+            List<Shocker>? shockers = GetShockersForUser(user);
+            if(shockers == null)
             {
-                List<OpenshockApiToken> tokens = d.OpenshockApiTokens.Where(x => x.User.Id == user.Id).ToList();
-                foreach (OpenshockApiToken token in tokens)
-                {
-                    OpenShockApiClient apiClient = GetApiClient(token);
-                    var devices = apiClient.GetOwnShockers();
-                    devices.Wait();
-                    if (devices.Result.IsT1)
-                    {
-                        request.SendString(JsonSerializer.Serialize(new ApiError {Message = "Token invalid"}), "application/json", 401);
-                        return true;
-                    }
-                    List<ResponseDeviceWithShockers> devicesAll = devices.Result.AsT0.Value.ToList();
-                    foreach (ResponseDeviceWithShockers device in devicesAll)
-                    {
-                        foreach (ShockerResponse sr in device.Shockers)
-                        {
-                            shockers.Add(new Shocker
-                            {
-                                ShockerId = sr.Id.ToString(),
-                                Name = device.Name + "." + sr.Name,
-                                ApiTokenId = token.Id,
-                                Paused = sr.IsPaused,
-                                Limits = new OpenShockShockerLimits(),
-                                Permissions = new OpenShockShockerPermissions()
-                            });
-                        }
-                    }
-                    List<OpenShockDevicesContainer> sharedShockers = GetSharedShockers(token) ?? new List<OpenShockDevicesContainer>();
-                    foreach (OpenShockDevicesContainer container in sharedShockers)
-                    {
-                        foreach (OpenShockDevice device in container.devices)
-                        {
-                            foreach (OpenShockShocker sr in device.shockers)
-                            {
-                                shockers.Add(new Shocker
-                                {
-                                    ShockerId = sr.id,
-                                    Name = device.name + "." + sr.name,
-                                    ApiTokenId = token.Id,
-                                    Paused = sr.isPaused,
-                                    Limits = sr.limits,
-                                    Permissions = sr.permissions
-                                });
-                            }
-                        }
-                    }
-                }
+                request.SendString(JsonSerializer.Serialize(new ApiError {Message = "Token invalid"}), "application/json", 401);
+                return true;
             }
             
             request.SendString(JsonSerializer.Serialize(shockers), "application/json");
@@ -257,7 +213,7 @@ public class AlarmServer
             }));
             return true;
         });
-         server.AddRoute("POST", "/api/v1/alarms/test", request =>
+        server.AddRoute("POST", "/api/v1/alarms/test", request =>
         {
             request.allowAllOrigins = true;
             User? user = UserManagementServer.GetUserBySession(request);
@@ -310,11 +266,14 @@ public class AlarmServer
                 ApiError.SendUnauthorized(request);
                 return true;
             }
-            List<Alarm.Alarm> alarms;
-            using (AppDbContext d = new())
+
+            using AppDbContext d = new();
+            if (request.queryString.Get("updateshockers") != null)
             {
-                alarms = d.Alarms.Where(x => x.User.Id == user.Id).ToList();
+                UpdateAlarmLimitsForUser(user, d);
             }
+            List<Alarm.Alarm> alarms;
+            alarms = d.Alarms.Where(x => x.User.Id == user.Id).ToList();
             request.SendString(JsonSerializer.Serialize(alarms), "application/json");
             return true;
         });
@@ -485,6 +444,102 @@ public class AlarmServer
             }));
             return true;
         });
+        server.AddRoute("GET", "/api/v1/shockers/update", request =>
+        {
+            request.allowAllOrigins = true;
+            User? user = UserManagementServer.GetUserBySession(request);
+            if (user == null)
+            {
+                ApiError.SendUnauthorized(request);
+                return true;
+            }
+            UpdateAlarmLimitsForUser(user);
+            request.SendString(JsonSerializer.Serialize(new ApiResponse
+            {
+                Success = true
+            }));
+            return true;
+        });
+    }
+
+    public static void UpdateAlarmLimitsForUser(User u, AppDbContext? d = null)
+    {
+        if (d == null) d = new AppDbContext();
+        List<Shocker>? shockers = GetShockersForUser(u);
+        if(shockers == null)
+        {
+            Logger.Log("Failed to get shockers for user");
+            return;
+        }
+
+        foreach (Shocker onlineShocker in shockers)
+        {
+            foreach (Shocker dbShocker in d.Shockers.Where(x => x.ShockerId == onlineShocker.ShockerId))
+            {
+                Logger.Log("Updating shocker " + dbShocker.Name);
+                onlineShocker.Limits.Id = dbShocker.Limits.Id;
+                onlineShocker.Permissions.Id = dbShocker.Permissions.Id;
+                d.Entry(dbShocker.Permissions).CurrentValues.SetValues(onlineShocker.Permissions);
+                d.Entry(dbShocker.Limits).CurrentValues.SetValues(onlineShocker.Limits);
+                dbShocker.Paused = onlineShocker.Paused;
+            }
+        }
+        d.SaveChanges();
+    }
+
+    public static List<Shocker>? GetShockersForUser(User user)
+    {
+        List<Shocker> shockers = new();
+        using (AppDbContext d = new())
+        {
+            List<OpenshockApiToken> tokens = d.OpenshockApiTokens.Where(x => x.User.Id == user.Id).ToList();
+            foreach (OpenshockApiToken token in tokens)
+            {
+                OpenShockApiClient apiClient = GetApiClient(token);
+                var devices = apiClient.GetOwnShockers();
+                devices.Wait();
+                if (devices.Result.IsT1)
+                {
+                    return null;
+                }
+                List<ResponseDeviceWithShockers> devicesAll = devices.Result.AsT0.Value.ToList();
+                foreach (ResponseDeviceWithShockers device in devicesAll)
+                {
+                    foreach (ShockerResponse sr in device.Shockers)
+                    {
+                        shockers.Add(new Shocker
+                        {
+                            ShockerId = sr.Id.ToString(),
+                            Name = device.Name + "." + sr.Name,
+                            ApiTokenId = token.Id,
+                            Paused = sr.IsPaused,
+                            Limits = new OpenShockShockerLimits(),
+                            Permissions = new OpenShockShockerPermissions()
+                        });
+                    }
+                }
+                List<OpenShockDevicesContainer> sharedShockers = GetSharedShockers(token) ?? new List<OpenShockDevicesContainer>();
+                foreach (OpenShockDevicesContainer container in sharedShockers)
+                {
+                    foreach (OpenShockDevice device in container.devices)
+                    {
+                        foreach (OpenShockShocker sr in device.shockers)
+                        {
+                            shockers.Add(new Shocker
+                            {
+                                ShockerId = sr.id,
+                                Name = device.name + "." + sr.name,
+                                ApiTokenId = token.Id,
+                                Paused = sr.isPaused,
+                                Limits = sr.limits,
+                                Permissions = sr.permissions
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        return shockers;
     }
 
     private static List<OpenShockDevicesContainer>? GetSharedShockers(OpenshockApiToken token)

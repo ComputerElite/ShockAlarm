@@ -196,6 +196,7 @@ public class UserManager
 
     public static void CreateDefaultUserIfNotExists()
     {
+        return;
         if (!IsRootUserNeeded()) return;
         if(DoesDefaultAdminUserExist()) return;
         using (AppDbContext c = new())

@@ -34,6 +34,15 @@
     let token;
     let alarms = [];
     let tones = [];
+    function updateShockers() {
+        fetchJson("/api/v1/alarms?updateshockers=true", {}, localStorage).then((res) => {
+            if(!res.ok) {
+                console.error("Failed to fetch alarms");
+                return;
+            }
+            alarms = res;
+        });
+    }
     function fetchAlarms() {
         fetchJson("/api/v1/alarms", {}, localStorage).then((res) => {
             if(!res.ok) {
@@ -68,24 +77,44 @@
         });
     }
     
+    function alarmsUpdated() {
+        alarmAdded = false;
+        fetchAlarms();
+    }
+    
+    function tonesUpdated() {
+        toneAdded = false;
+        fetchTones();
+    }
+    
+    let alarmAdded = false;
+    let toneAdded = false;
 </script>
 {#if tokens.length > 0}
-    <h1>Create alarm</h1>
-    <Alarm tones={tones} expanded={true}/>
-    <h1>Existing alarms</h1>
+    <button on:click={updateShockers}>Update shocker limits</button>
+    <h1>Alarms</h1>
+    {#if alarmAdded}
+        <Alarm savedCallback={alarmsUpdated} tones={tones} expanded={true}/>
+    {:else}
+        <button class="round" style="font-size: 1.5rem;" on:click={() => alarmAdded = true}>+</button>
+    {/if}
     {#each alarms as alarm}
-        <Alarm tones={tones} alarm={alarm}/>
+        <Alarm savedCallback={alarmsUpdated} tones={tones} alarm={alarm}/>
     {:else}
         <p>No alarms</p>
     {/each}
 {:else}
-    <p class="shocker">Add an access token from <a href="https://openshock.app/#/dashboard/tokens">OpenShock</a> below to create alarms for your shockers.</p>
+    <p class="shocker warning">Add an access token from <a href="https://openshock.app/#/dashboard/tokens">OpenShock</a> below to create alarms for your shockers.</p>
 {/if}
-<h1>Create Alarm Tone</h1>
-<Tone/>
-<h1>Existing Alarm Tones</h1>
+
+<h1>Alarm Tones</h1>
+{#if toneAdded}
+    <Tone expanded={true} savedCallback={tonesUpdated}/>
+{:else}
+    <button class="round" style="font-size: 1.5rem;" on:click={() => toneAdded = true}>+</button>
+{/if}
 {#each tones as tone}
-    <Tone {tone}/>
+    <Tone savedCallback={tonesUpdated} {tone}/>
 {:else}
     <p>No tones</p>
 {/each}

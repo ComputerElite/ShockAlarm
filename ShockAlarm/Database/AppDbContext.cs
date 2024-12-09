@@ -22,6 +22,7 @@ public class AppDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Shocker>().HasIndex(x => x.ShockerId);
         modelBuilder.Entity<User>().HasKey(x => x.Id);
         modelBuilder.Entity<UserSession>().HasKey(x => x.Id);
         modelBuilder.Entity<OpenshockApiToken>().HasKey(x => x.Id);

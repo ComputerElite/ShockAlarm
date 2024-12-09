@@ -26,8 +26,7 @@ function save() {
             alert(res.Error)
             return;
         }
-        location.reload();
-        alert("Alarm tone saved")
+        savedCallback();
     })
 }
 
@@ -47,6 +46,7 @@ function del() {
 }
 
 export let expanded = false;
+export let savedCallback;
 function toneChanged() {
     expanded = true;
 }
@@ -135,11 +135,15 @@ function cloneComponent(i) {
                     <label for="duration">Duration ms</label>
                 </div>
             </div>
+        {:else}
+            <p class="shocker warning">Add a component to get started with your tone</p>
         {/each}
         <button on:click={addComponent}>Add component</button>
         <button class="green" on:click={save}>{tone.Id ? "Save" : "Add alarm tone"}</button>
         {#if tone.Id}
             <button class="red" on:click={del}>Delete</button>
+        {:else}
+            <button on:click={savedCallback}>Cancel</button>
         {/if}
     {/if}
 </div>
