@@ -64,6 +64,9 @@ public class UserManager
 
     public static LoginResponse InitiateRegister(string username)
     {
+        if(username == "") {
+            return new LoginResponse {Error = "Username must not be empty"};
+        }
         User? u = GetUserByUsername(username);
         if(u != null)
         {
