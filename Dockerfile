@@ -22,5 +22,6 @@ RUN dotnet tool install --global --version 9.0.0 dotnet-ef
 RUN cp /app/ShockAlarm/docker_config.json /app/ShockAlarm/bin/Debug/net8.0/config.json
 RUN cp /app/ShockAlarm/docker_config.json /app/ShockAlarm/bin/Release/net8.0/config.json
 RUN cp /app/ShockAlarm/docker_config.json /app/ShockAlarm/config.json
+RUN apt update && apt install sqlite3
 WORKDIR /app/ShockAlarm
 CMD ["bash", "migrate_db_and_start.sh"]
