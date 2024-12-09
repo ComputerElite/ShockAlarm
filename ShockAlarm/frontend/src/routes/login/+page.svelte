@@ -7,11 +7,16 @@
 </style>
 <CenteredBox>
     {#if state === "pwd"}
-        <h1>Login</h1>
+        <h1>{isLogin ? "Login" : "Register"}</h1>
         <label for="username">Username<input bind:this={username} on:keydown={onKeyDownUsername} id="username" type="text" placeholder="Username" /></label><br>
         <label for="password">Password<input bind:this={password} on:keydown={onKeyDownPassword} id="password" type="password" placeholder="Password" /></label><br>
-        <button on:click={startLogin}>Login</button>
-        <button on:click={startRegister}>Register</button>
+        {#if isLogin}
+            <button on:click={startLogin}>Login</button>
+            <button on:click={startRegister}>Register</button>
+        {:else}
+            <button on:click={startRegister}>Register</button>
+            <button on:click={startLogin}>Login</button>
+        {/if}
         {#if loginError}
             <ErrorBox>{loginError}</ErrorBox>
         {/if}
@@ -30,6 +35,8 @@
     import {goto} from "$app/navigation";
     import { page } from '$app/stores';
     import {onMount} from "svelte";
+
+    let isLogin = true;
 
     function onKeyDownUsername(e) {
         if(e.key == "Enter") password.focus()
@@ -56,6 +63,12 @@
     let loginError = "";
     let twoFAChallengeId = "";
     function startRegister() {
+        if(!username.value) {
+            if(isLogin) {
+                isLogin = false
+                return;
+            }
+        }
         fetchJson("/api/v1/user/start_register", {
             method: "POST",
             body: JSON.stringify({
@@ -95,6 +108,12 @@
         })
     }
     function startLogin() {
+        if(!username.value) {
+            if(!isLogin) {
+                isLogin = true
+                return;
+            }
+        }
         fetchJson("/api/v1/user/start_login", {
             method: "POST",
             body: JSON.stringify({
