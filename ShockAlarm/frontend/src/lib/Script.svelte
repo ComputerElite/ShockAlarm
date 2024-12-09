@@ -98,7 +98,7 @@
         params["credentials"] = "include";
         if(localStorage) {
             if(localStorage.session) {
-                console.log("session cookie is " + localStorage.getItem("session"))
+                //console.log("session cookie is " + localStorage.getItem("session"))
                 params["headers"]["Authorization"] = `Bearer ${localStorage.session}`;
             }
         } else {
