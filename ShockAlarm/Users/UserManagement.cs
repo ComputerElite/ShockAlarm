@@ -5,7 +5,7 @@ namespace ShockAlarm.Users;
 public class UserManager
 {
     public static List<Challenge> challenges = new List<Challenge>();
-    public static TimeSpan SessionValidity = new TimeSpan(0, 12, 0, 0); // Sessions are valid for 12 hours
+    public static TimeSpan SessionValidity = new TimeSpan(30, 0, 0, 0); // Sessions are valid for 30 days
     public UserManager()
     {
         
