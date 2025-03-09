@@ -488,7 +488,7 @@ public class AlarmServer
                 }
                 else
                 {
-                    onlineShocker.Limits.Id = dbShocker.Limits.Id;
+                    onlineShocker.Limits.Id = dbShocker.Limits?.Id;
                     d.Entry(dbShocker.Limits).CurrentValues.SetValues(onlineShocker.Limits);
                 }
                 if (onlineShocker.Permissions == null)
@@ -497,7 +497,7 @@ public class AlarmServer
                 }
                 else
                 {
-                    onlineShocker.Permissions.Id = dbShocker.Limits.Id;
+                    onlineShocker.Permissions.Id = dbShocker.Limits?.Id;
                     d.Entry(dbShocker.Permissions).CurrentValues.SetValues(onlineShocker.Permissions);
                 }
                 dbShocker.Paused = onlineShocker.Paused;

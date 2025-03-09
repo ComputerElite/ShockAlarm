@@ -32,7 +32,7 @@ public class OpenShockShocker
 public class OpenShockShockerLimits
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     public byte intensity { get; set; } = 100;
     public ushort duration { get; set; } = 30000;
@@ -41,7 +41,7 @@ public class OpenShockShockerLimits
 public class OpenShockShockerPermissions
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string Id { get; set; }
+    public string? Id { get; set; }
     public bool shock { get; set; } = true;
     public bool vibrate { get; set; } = true;
     public bool sound { get; set; } = true;
