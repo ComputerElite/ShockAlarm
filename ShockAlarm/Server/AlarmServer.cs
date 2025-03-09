@@ -26,7 +26,12 @@ public class AlarmServer
 
             using (AppDbContext d = new())
             {
-                request.SendString(JsonSerializer.Serialize(d.OpenshockApiTokens.Where(x=> x.User == user).ToList()), "application/json");
+                List<OpenshockApiToken> tokens = d.OpenshockApiTokens.Where(x => x.User == user).ToList();
+                foreach (OpenshockApiToken token in tokens)
+                {
+                    token.Token = token.Token.Substring(0, 10) + "..."; // truncate token
+                }
+                request.SendString(JsonSerializer.Serialize(tokens), "application/json");
             }
             return true;
         });
