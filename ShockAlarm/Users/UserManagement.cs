@@ -143,20 +143,15 @@ public class UserManager
 
     public static LoginResponse Login(LoginRequest request)
     {
-        Challenge? rl = challenges.FirstOrDefault(x => x.Id == request.ChallengeId && x.Type == ChallengeType.Password);
-        if(rl == null)
-        {
-            return new LoginResponse { Error = "Password challenge with this id not found" };
-        }
-        challenges.Remove(rl);
-        User? u = GetUserByUUID(rl.UserId);
+        User? u = GetUserByUsername(request.Username);
         if(u == null)
         {
-            return new LoginResponse { Error = "User associated with challenge not found" };
+            return new LoginResponse { Error = "User doesn't exist" };
         }
         
         // hash password
-        if (u.PasswordHash != request.PasswordHash.ToLower())
+        string hash = CryptographicsHelper.GetHash(request.Password + u.Salt).ToLower();
+        if (u.PasswordHash != hash)
         {
             return new LoginResponse { Error = "Password incorrect" };
         }
@@ -185,54 +180,19 @@ public class UserManager
         }
     }
 
-    public static bool IsRootUserNeeded()
+    public static LoginResponse Register(LoginRequest request)
     {
-        
-        using (AppDbContext c = new())
-        {
-            return c.Users.Count(x => x.Id != User.DefaultAdminUser.Id) == 0;
-        }
-    }
-
-    public static void CreateDefaultUserIfNotExists()
-    {
-        return;
-        if (!IsRootUserNeeded()) return;
-        if(DoesDefaultAdminUserExist()) return;
-        using (AppDbContext c = new())
-        {
-            c.Users.Add(User.DefaultAdminUser);
-            c.SaveChanges();
-        }
-    }
-
-    private static bool DoesDefaultAdminUserExist()
-    {
-        using (AppDbContext c = new())
-        {
-            return c.Users.Any(x => x.Id == User.DefaultAdminUser.Id);
-        }
-    }
-
-    public static RegisterResponse Register(LoginRequest request)
-    {
-        
-        Challenge? rl = challenges.FirstOrDefault(x => x.Id == request.ChallengeId && x.Type == ChallengeType.Register);
-        if(rl == null)
-        {
-            return new RegisterResponse { Error = "Password challenge with this id not found" };
-        }
-        challenges.Remove(rl);
-        User? u = GetUserByUsername(rl.Username);
+        User? u = GetUserByUsername(request.Username);
         if(u != null)
         {
-            return new RegisterResponse { Error = "User already exists" };
+            return new LoginResponse { Error = "User already exists" };
         }
+        String salt = CryptographicsHelper.GetRandomString(64, 64);
         u = new User
         {
             Username = request.Username,
-            PasswordHash = request.PasswordHash.ToLower(),
-            Salt = rl.Nonce + request.CNonce,
+            PasswordHash = CryptographicsHelper.GetHash(request.Password + salt).ToLower(),
+            Salt = salt,
             TwoFactorEnabled = false
         };
         using (AppDbContext c = new())
@@ -242,6 +202,6 @@ public class UserManager
         }
         // create session
         UserSession s = CreateUserSession(u, SessionValidity);
-        return new RegisterResponse { Success = true, SessionId = s.Id };
+        return new LoginResponse { Success = true, SessionId = s.Id };
     }
 }

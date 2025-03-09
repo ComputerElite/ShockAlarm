@@ -69,42 +69,22 @@
                 return;
             }
         }
-        fetchJson("/api/v1/user/start_register", {
+        
+        fetchJson("/api/v1/user/register", {
             method: "POST",
             body: JSON.stringify({
-                Username: username.value
+                Username: username.value,
+                Password: password.value
             })
         }).then((res) => {
             if(!res.Success) {
-                // user doesn't exist or something like that
+                // some error occurred, display it
                 loginError = res.Error;
                 return;
             }
-            console.log("server nonce is " + res.Nonce)
-            const clientNonce = getRandomString();
-            console.log("client nonce is " + clientNonce)
-            // salted password hash to server
-            hashStringSHA256(password.value + res.Nonce + clientNonce).then((passwordHash) => {
-                fetchJson("/api/v1/user/register", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        Username: username.value,
-                        PasswordHash: passwordHash,
-                        CNonce: clientNonce,
-                        ChallengeId: res.ChallengeId
-                    })
-                }).then((res) => {
-                    if(!res.Success) {
-                        // some error occurred, display it
-                        loginError = res.Error;
-                        return;
-                    }
-                    // user should be logged in, save session
-                    saveSession(res.SessionId, localStorage)
-                    goto(afterLogin)
-                })
-            })
-            
+            // user should be logged in, save session
+            saveSession(res.SessionId, localStorage)
+            goto(afterLogin)
         })
     }
     function startLogin() {
@@ -114,46 +94,27 @@
                 return;
             }
         }
-        fetchJson("/api/v1/user/start_login", {
+        fetchJson("/api/v1/user/login", {
             method: "POST",
             body: JSON.stringify({
-                Username: username.value
+                Username: username.value,
+                Password: password.value,
             })
         }).then((res) => {
             if(!res.Success) {
-                // user doesn't exist or something like that
+                // some error occurred, display it
                 loginError = res.Error;
                 return;
             }
-            console.log("server nonce is " + res.Nonce)
-            // salted password hash to server
-            hashStringSHA256(password.value + res.Nonce).then((passwordHash) => {
-                fetchJson("/api/v1/user/login", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        Username: username.value,
-                        PasswordHash: passwordHash,
-                        ChallengeId: res.ChallengeId
-                    })
-                }).then((res) => {
-                    if(!res.Success) {
-                        // some error occurred, display it
-                        loginError = res.Error;
-                        return;
-                    }
-                    if (res.Requires2fa) {
-                        // userrequires 2fa, ask for TOTP token
-                        twoFAChallengeId = res.ChallengeId
-                        state = "totp"
-                        return;
-                    }
-                    // user should be logged in, save session
-                    saveSession(res.SessionId, localStorage)
-                    goto(afterLogin)
-                })
-            })
-            
+            if (res.Requires2fa) {
+                // userrequires 2fa, ask for TOTP token
+                twoFAChallengeId = res.ChallengeId
+                state = "totp"
+                return;
+            }
+            // user should be logged in, save session
+            saveSession(res.SessionId, localStorage)
+            goto(afterLogin)
         })
-
     }
 </script>
