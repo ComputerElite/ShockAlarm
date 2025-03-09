@@ -203,8 +203,8 @@ public class AlarmServer
                     s.ApiToken = d.OpenshockApiTokens.FirstOrDefault(x => x.Id == s.ApiTokenId);
                     if(s.ToneId != null) s.Tone = d.AlarmTones.FirstOrDefault(x => x.Id == s.ToneId);
                     if(s.Tone != null) s.ToneName = s.Tone.Name;
-                    s.Permissions.Id = null;
-                    s.Limits.Id = null;
+                    if (s.Permissions != null) s.Permissions.Id = null;
+                    if (s.Limits != null) s.Limits.Id = null;
                 }
 
                 alarm.UpdateNextTrigger();

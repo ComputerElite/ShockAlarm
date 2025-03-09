@@ -24,9 +24,9 @@ public class Shocker : ShockerControlData
 
     public bool Paused { get; set; }
     public string LimitsId { get; set; }
-    public OpenShockShockerLimits Limits { get; set; }
+    public OpenShockShockerLimits? Limits { get; set; }
     public string PermissionsId { get; set; }
-    public OpenShockShockerPermissions Permissions { get; set; }
+    public OpenShockShockerPermissions? Permissions { get; set; }
 
     public Shocker() {}
 
