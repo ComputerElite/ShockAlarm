@@ -180,9 +180,10 @@ public class AlarmServer
                 return true;
             }
             alarm.User = user;
+            Alarm.Alarm? existingAlarm;
             using (AppDbContext d = new())
             {
-                Alarm.Alarm? existingAlarm = d.Alarms.FirstOrDefault(x => x.Id == alarm.Id);
+                existingAlarm = d.Alarms.FirstOrDefault(x => x.Id == alarm.Id);
                 if (existingAlarm != null)
                 {
                     if (existingAlarm.User.Id != user.Id)
@@ -205,6 +206,19 @@ public class AlarmServer
                     if(s.Tone != null) s.ToneName = s.Tone.Name;
                     if (s.Permissions != null) s.Permissions.Id = null;
                     if (s.Limits != null) s.Limits.Id = null;
+                    if (existingAlarm != null)
+                    {
+                        Shocker? existinShocker = existingAlarm.Shockers.FirstOrDefault(x => x.ShockerId == s.ShockerId);
+                        if (existinShocker != null)
+                        {
+                            s.Permissions = existinShocker.Permissions;
+                            s.Limits = existinShocker.Limits;
+                            s.PermissionsId = existinShocker.PermissionsId;
+                            s.LimitsId = existinShocker.LimitsId;
+                            s.Name = existinShocker.Name;
+                            s.Paused = existinShocker.Paused;
+                        }
+                    }
                 }
 
                 alarm.UpdateNextTrigger();
