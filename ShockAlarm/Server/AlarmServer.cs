@@ -212,7 +212,11 @@ public class AlarmServer
                         if (existinShocker != null)
                         {
                             s.Permissions = existinShocker.Permissions;
+                            if (s.Permissions != null) s.Permissions.Id = null;
+                            s.PermissionsId = s.Permissions?.Id;
                             s.Limits = existinShocker.Limits;
+                            if (s.Limits != null) s.Limits.Id = null;
+                            s.LimitsId = s.Limits?.Id;
                             s.PermissionsId = existinShocker.PermissionsId;
                             s.LimitsId = existinShocker.LimitsId;
                             s.Name = existinShocker.Name;
