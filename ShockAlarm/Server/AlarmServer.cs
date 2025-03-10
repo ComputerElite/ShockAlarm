@@ -500,6 +500,8 @@ public class AlarmServer
                     onlineShocker.Permissions.Id = dbShocker.Limits?.Id;
                     d.Entry(dbShocker.Permissions).CurrentValues.SetValues(onlineShocker.Permissions);
                 }
+                dbShocker.ApiTokenId = onlineShocker.ApiTokenId;
+                dbShocker.Name = onlineShocker.Name;
                 dbShocker.Paused = onlineShocker.Paused;
             }
         }
