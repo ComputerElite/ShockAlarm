@@ -486,19 +486,17 @@ public class AlarmServer
                 {
                     dbShocker.Limits = onlineShocker.Limits;
                 }
-                else
+                else if(onlineShocker.Limits != null)
                 {
-                    onlineShocker.Limits.Id = dbShocker.Limits?.Id;
-                    d.Entry(dbShocker.Limits).CurrentValues.SetValues(onlineShocker.Limits);
+                    d.Entry(dbShocker.Limits).CurrentValues.SetValues(OpenShockShockerLimitsWithoutId.From(onlineShocker.Limits));
                 }
                 if (dbShocker.Permissions == null)
                 {
                     dbShocker.Permissions = onlineShocker.Permissions;
                 }
-                else
+                else if(onlineShocker.Permissions != null)
                 {
-                    onlineShocker.Permissions.Id = dbShocker.Limits?.Id;
-                    d.Entry(dbShocker.Permissions).CurrentValues.SetValues(onlineShocker.Permissions);
+                    d.Entry(dbShocker.Permissions).CurrentValues.SetValues(OpenShockShockerPermissionsWithoutId.From(onlineShocker.Permissions));
                 }
                 dbShocker.ApiTokenId = onlineShocker.ApiTokenId;
                 dbShocker.Name = onlineShocker.Name;
