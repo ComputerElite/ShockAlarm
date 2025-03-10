@@ -622,10 +622,10 @@ public class AlarmServer
         }
     }
 
-    public static OpenShockApiClient GetApiClient(OpenshockApiToken t)
+    public static OpenShockApiClient GetApiClient(OpenshockApiToken? t)
     {
         
-        return new OpenShockApiClient(new ApiClientOptions { Token = t.Token, Server = new Uri(t.Server)});
+        return new OpenShockApiClient(new ApiClientOptions { Token = t?.Token ?? "", Server = new Uri(t.Server)});
     }
 
     private static List<Alarm.Alarm> AlarmCache { get; set; } = new List<Alarm.Alarm>();
