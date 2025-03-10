@@ -482,18 +482,18 @@ public class AlarmServer
             foreach (Shocker dbShocker in d.Shockers.Where(x => x.ShockerId == onlineShocker.ShockerId))
             {
                 Logger.Log("Updating shocker " + dbShocker.Name);
-                if (onlineShocker.Limits == null)
+                if (dbShocker.Limits == null)
                 {
-                    onlineShocker.Limits = dbShocker.Limits;
+                    dbShocker.Limits = onlineShocker.Limits;
                 }
                 else
                 {
                     onlineShocker.Limits.Id = dbShocker.Limits?.Id;
                     d.Entry(dbShocker.Limits).CurrentValues.SetValues(onlineShocker.Limits);
                 }
-                if (onlineShocker.Permissions == null)
+                if (dbShocker.Permissions == null)
                 {
-                    onlineShocker.Permissions = dbShocker.Permissions;
+                    dbShocker.Permissions = onlineShocker.Permissions;
                 }
                 else
                 {
