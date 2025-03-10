@@ -11,7 +11,7 @@
     let hour;
     let dayOfMonth;
     let month;
-    let allWeekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let allWeekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     let weekdays = [];
     onMount(() => {
         if(!timeZone) timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -24,6 +24,7 @@
         hour = parts[2];
         dayOfMonth = parts[3] ?? "?";
         month = parts[4] ?? "*";
+        if((parts[5] ?? "*") !== "*") parts[5] = parts[5].split(",").map(x=> parseInt(x) - 1).join(",");
         for(let i = 0; i < allWeekdays.length; i++) {
             if(parts[5].includes(i)) {
                 weekdays.push(i);
@@ -37,8 +38,8 @@
             let y = x + dayChange;
             if(y < 0) y = 6;
             if(y > 6) y = 0;
-            return y;
-        }).join(",")
+            return y + 1;
+        }).join(",");
         if(d == "") d = "*"
         return d;
     }

@@ -63,7 +63,8 @@ public class AlarmServer
             
             
             // Get username of token
-            OpenShockApiClient client = new(new ApiClientOptions {Token = token.Token});
+            
+            OpenShockApiClient client = GetApiClient(token);
             var self = client.GetSelf().Result;
             if (self.IsT1)
             {
