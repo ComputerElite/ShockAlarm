@@ -7,7 +7,7 @@ namespace ShockAlarm.Alarm;
 public class AlarmTone
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string Id { get; set; }
+    public string? Id { get; set; }
     public string Name { get; set; }
     public bool IsPublic { get; set; }
     public User User { get; set; }
@@ -17,7 +17,7 @@ public class AlarmTone
 public class AlarmToneComponent : ShockerControlData
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     public double TriggerSeconds { get; set; } = 0;
     [NotMapped]

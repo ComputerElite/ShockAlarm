@@ -411,6 +411,10 @@ public class AlarmServer
             using(AppDbContext d = new())
             {
                 d.Attach(user);
+                foreach (AlarmToneComponent component in tone.Components)
+                {
+                    component.Id = null; // make sure a new one gets added to the db
+                }
                 d.AlarmTones.Add(tone);
                 d.SaveChanges();
             }
