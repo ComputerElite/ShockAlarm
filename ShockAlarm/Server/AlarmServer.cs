@@ -405,6 +405,7 @@ public class AlarmServer
                     }
 
                     d.Entry(existingTone).CurrentValues.SetValues(tone);
+                    existingTone.Components = tone.Components;
                     existingTone.User = user;
                     d.Update(existingTone);
                 }
