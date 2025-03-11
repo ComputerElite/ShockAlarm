@@ -391,9 +391,10 @@ public class AlarmServer
                 ApiError.MalformedRequest(request);
                 return true;
             }
-            tone.User = user;
+
             using (AppDbContext d = new())
             {
+                d.Attach(user);
                 AlarmTone? existingTone = d.AlarmTones.FirstOrDefault(x => x.Id == tone.Id);
                 if (existingTone != null)
                 {
@@ -403,21 +404,17 @@ public class AlarmServer
                         return true;
                     }
 
-                    d.AlarmTones.Remove(existingTone);
-                    d.SaveChanges();
+                    d.Entry(existingTone).CurrentValues.SetValues(tone);
+                    existingTone.User = user;
                 }
-            }
-            
-            using(AppDbContext d = new())
-            {
-                d.Attach(user);
-                foreach (AlarmToneComponent component in tone.Components)
+                else
                 {
-                    component.Id = null; // make sure a new one gets added to the db
+                    d.AlarmTones.Add(tone);
                 }
-                d.AlarmTones.Add(tone);
+
                 d.SaveChanges();
             }
+
             request.SendString(JsonSerializer.Serialize(new ApiResponse
             {
                 CreatedId = tone.Id,
