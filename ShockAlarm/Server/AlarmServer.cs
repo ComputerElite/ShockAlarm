@@ -398,7 +398,7 @@ public class AlarmServer
                 AlarmTone? existingTone = d.AlarmTones.FirstOrDefault(x => x.Id == tone.Id);
                 if (existingTone != null)
                 {
-                    if (existingTone.User.Id != user.Id)
+                    if (existingTone.User == null || existingTone.User.Id != user.Id)
                     {
                         ApiError.SendUnauthorized(request);
                         return true;
