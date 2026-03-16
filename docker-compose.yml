@@ -1,5 +1,6 @@
 services:
   dotnet_app:
+    restart: unless-stopped
     build:
       context: .  # Build from the current directory
       dockerfile: Dockerfile  # Use the specified Dockerfile
