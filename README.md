@@ -1,4 +1,5 @@
-# ShockAlarm
+> [!WARNING]
+> This repository has moved to Codeberg: https://codeberg.org/kaiya/ShockAlarm # ShockAlarm
 A UI for setting alarms for [OpenShock](https://openshock.app).
 
 ## Installation
